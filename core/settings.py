@@ -44,12 +44,17 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:8000",
     "http://localhost:3002",
     "http://localhost:3000",
+    "https://python-js-test-task.us.aldryn.io",
+    "https://python-js-test-task-stage.us.aldryn.io"
 ]
 
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:8000",
     "http://localhost:3002",
     "http://localhost:3000",
+    "https://python-js-test-task.us.aldryn.io",
+    "https://python-js-test-task-stage.us.aldryn.io"
+    
 ]
 
 CORS_ALLOW_HEADERS = [
