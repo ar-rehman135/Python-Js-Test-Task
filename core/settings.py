@@ -26,9 +26,8 @@ SECRET_KEY = 'django-insecure-3n^(l)laina!7t4=+oj(y*lgstwuiixtgta+1-uxb1*ad2)rl8
 DEBUG = True
 
 if DEBUG:
-    BASE_URL = "http://127.0.0.1:8000"
+    BASE_URL = "https://python-js-test-task-stage.us.aldryn.io"
 else:
-
     BASE_URL = "http://127.0.0.1:8000"
 
 ALLOWED_HOSTS = [
