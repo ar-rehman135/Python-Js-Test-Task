@@ -26,21 +26,59 @@ SECRET_KEY = 'django-insecure-3n^(l)laina!7t4=+oj(y*lgstwuiixtgta+1-uxb1*ad2)rl8
 DEBUG = True
 
 if DEBUG:
-    # BASE_URL = "https://12a5-39-49-143-99.ngrok-free.app"
-    # BASE_URL = "https://secureria-member.com"
     BASE_URL = "http://127.0.0.1:8000"
 else:
-    # BASE_URL = "http://54.173.94.217"
-    # BASE_URL = "http://54.173.94.217"
-    "Later we will add deployed link here"
-    BASE_URL = "https://secureria-member.com"
 
-ALLOWED_HOSTS = []
+    BASE_URL = "http://127.0.0.1:8000"
 
+ALLOWED_HOSTS = [
+    'localhost',
+    '*',
+    "http://localhost:3002",
+]
+
+
+CORS_ALLOW_ALL_ORIGINS = True  
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:8000",
+    "http://localhost:3002",
+    "http://localhost:3000",
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:8000",
+    "http://localhost:3002",
+    "http://localhost:3000",
+]
+
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+    '*'
+]
+
+CORS_ALLOW_METHODS = [
+    'GET',
+    'POST',
+    'PUT',
+    'DELETE',
+    'OPTIONS',
+    'PATCH',
+    '*'
+]
 
 # Application definition
 
 INSTALLED_APPS = [
+    'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -55,6 +93,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
