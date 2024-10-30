@@ -9,6 +9,7 @@ from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from rest_framework.decorators import action
 from .pagination import StandardResultsPagination
+from rest_framework.exceptions import ValidationError
 
 # Create your views here.
 class ProductViewSet(viewsets.ModelViewSet):
@@ -81,10 +82,14 @@ class ProductViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['post'])
     def create(self, request, *args, **kwargs):
         try:
-            serializer = self.get_serializer(data=request.data)
-            serializer.is_valid(raise_exception=True)
-            product = serializer.save()  
             
+            serializer = self.get_serializer(data=request.data)
+            
+            # Validate data and raise exception if invalid
+            serializer.is_valid(raise_exception=True)
+            product = serializer.save()
+            
+            # Success response
             return Response({
                 "status": "success",
                 "message": "Product created successfully.",
@@ -97,11 +102,20 @@ class ProductViewSet(viewsets.ModelViewSet):
                 }
             }, status=status.HTTP_201_CREATED)
         
-        except Exception as e:
+        except ValidationError as e:
+            # If validation error, return detailed field errors
             return Response({
                 "status": "error",
-                "message": "An error occurred while creating the product.",
-                "data": {}
+                "message": "Validation failed.",
+                "errors": e.detail  # Detailed validation errors by field
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        except Exception as e:
+            # For any other unforeseen errors, return a generic error message
+            return Response({
+                "status": "error",
+                "message": "An unexpected error occurred while creating the product.",
+                "error": str(e)
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     @swagger_auto_schema(
