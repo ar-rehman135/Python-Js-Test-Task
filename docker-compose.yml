@@ -1,0 +1,15 @@
+version: '3.4'
+
+services:
+  taskbd:
+    image: taskbd
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    ports:
+      - 8000:8000
+    environment:
+      DEBUG: 'True'
+      DJANGO_SUPERUSER_USERNAME: 'admin'
+      DJANGO_SUPERUSER_EMAIL: 'admin@example.com'
+      DJANGO_SUPERUSER_PASSWORD: 'supersecret'
