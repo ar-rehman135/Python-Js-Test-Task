@@ -28,7 +28,7 @@ class ProductViewSet(viewsets.ModelViewSet):
                 type=openapi.TYPE_STRING
             ),
             openapi.Parameter(
-                'sort', openapi.IN_QUERY, description="Sort products by a field (id, name, price, stock). Prefix with '-' for descending order.",
+                'sort', openapi.IN_QUERY, description="Sort products by a field (id, name, price, stock, description). Prefix with '-' for descending order.",
                 type=openapi.TYPE_STRING
             ),
         ]
@@ -49,7 +49,7 @@ class ProductViewSet(viewsets.ModelViewSet):
                 sort_order = ''
             
             # Ensure the sort field is valid
-            valid_sort_fields = ['id', 'name', 'price', 'stock']
+            valid_sort_fields = ['id', 'name', 'price', 'stock','description']
             if sort_field not in valid_sort_fields:
                 sort_field = 'id'  # Default fallback if invalid sort field is given
 
