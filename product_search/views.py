@@ -10,6 +10,9 @@ from drf_yasg import openapi
 from rest_framework.decorators import action
 from .pagination import StandardResultsPagination
 from rest_framework.exceptions import ValidationError
+from django.shortcuts import get_object_or_404
+
+
 
 # Create your views here.
 class ProductViewSet(viewsets.ModelViewSet):
@@ -153,3 +156,75 @@ class ProductViewSet(viewsets.ModelViewSet):
                 "message": "An error occurred while marking the product as selected.",
                 "data": {}
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class SelectedProductViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    queryset = SelectedProduct.objects.all()
+    serializer_class = SelectedProductSerializer
+    pagination_class = StandardResultsPagination
+    
+    
+    @swagger_auto_schema(
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'product_ids': openapi.Schema(
+                    type=openapi.TYPE_ARRAY,
+                    items=openapi.Schema(type=openapi.TYPE_INTEGER),
+                    description="List of product IDs to select"
+                )
+            },
+            required=['product_ids'],
+            example={
+                "product_ids": [1, 2, 3]
+            }
+        )
+    )
+    @action(detail=False, methods=['post'])
+    def select_products(self, request):
+        product_ids = request.data.get('product_ids', [])
+        
+        if not product_ids:
+            return Response({
+                "status": "error",
+                "message": "No products selected."
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Filter products by IDs and ensure only unique selections
+        selected_products = []
+        for product_id in product_ids:
+            product = get_object_or_404(Product, id=product_id)
+            selected_product, created = SelectedProduct.objects.get_or_create(user=request.user, product=product)
+            if created:
+                selected_products.append(selected_product)
+        
+        # Retrieve detailed information about each selected product
+        selected_product_instances = Product.objects.filter(id__in=product_ids)
+        product_serializer = ProductSearchSerializer(selected_product_instances, many=True)
+        
+        return Response({
+            "status": "success",
+            "message": "Products selected successfully.",
+            "data": product_serializer.data  # Return full product details
+        }, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['get'])
+    def selected_products(self, request):
+        # Retrieve all products selected by the user
+        selected_products = Product.objects.filter(selected_by_users__user=request.user)
+        
+        # Apply pagination
+        page = self.paginate_queryset(selected_products)
+        if page is not None:
+            serializer = ProductSearchSerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        
+        # If pagination is not applied, return the full result
+        serializer = ProductSearchSerializer(selected_products, many=True)
+        
+        return Response({
+            "status": "success",
+            "message": "Selected products retrieved successfully.",
+            "data": serializer.data
+        }, status=status.HTTP_200_OK)
